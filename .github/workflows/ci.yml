@@ -27,8 +27,13 @@ jobs:
           python-version: '3.12'
       - run: python -m latentlab demo > /tmp/demo.json
       - run: python examples/render_audit.py --check
+      - run: python -m latentlab importance-demo > /tmp/importance-demo.json
+      - run: python -m latentlab importance examples/importance-input.json > /tmp/anchor.json
+      - run: python examples/render_importance.py --check
       - run: python -m pip install setuptools wheel
       - run: pip wheel --no-deps --no-build-isolation . -w /tmp/wheels
-      - run: pip install --no-deps /tmp/wheels/latentlab-0.1.0-py3-none-any.whl
+      - run: pip install --no-deps /tmp/wheels/latentlab-0.2.0-py3-none-any.whl
       - run: cd /tmp && latentlab demo > /tmp/wheel-demo.json
       - run: python -c "import json; a=json.load(open('/tmp/demo.json')); b=json.load(open('/tmp/wheel-demo.json')); assert a==b"
+      - run: cd /tmp && latentlab importance-demo > /tmp/wheel-importance-demo.json
+      - run: python -c "import json; assert json.load(open('/tmp/importance-demo.json'))==json.load(open('/tmp/wheel-importance-demo.json'))"
