@@ -6,6 +6,22 @@ The interesting result is a failure of reconstruction as a generation metric. On
 
 ![Measured initial and trained prior samples versus posterior-mean reconstructions](assets/latent-audit.svg)
 
+## Importance evidence audit (v0.2)
+
+The new [importance audit](IMPORTANCE.md) separates random log-evidence estimates, expected IWAE bounds and same-sample Jensen comparisons. Log-space weights preserve every latent/proposal/joint witness. For the original trained beta 1 model at x=(1,0), shared noise prefixes give log estimates -2.0464, 0.7106, -0.2701, -0.9271 for K=1,4,16,64: larger prefixes are not realization-wise guarantees. Actual nonlinear evidence is unknown.
+
+An independent linear-Gaussian exact-posterior control recovers log evidence -2.153795. A two-atom full-support control has **ESS 64 while underestimating evidence by factor 999,000**, on an event with probability **93.80%**. Exact rational enumeration verifies unbiased mean evidence and the increasing expected-log hierarchy, which still remains far from the truth. This adds evidence diagnostics, not IWAE training or an ESS accuracy certificate.
+
+![Importance prefix tables and exact-reference failure controls](assets/importance-audit.svg)
+
+```sh
+python -m latentlab importance-demo > /tmp/importance-demo.json
+python -m latentlab importance examples/importance-input.json > /tmp/anchor.json
+python examples/render_importance.py --check
+```
+
+43 tests now pass (25 original, 15 importance, 3 new figure tests). The original demo and SVG are unchanged. The five-module v0.2 wheel reproduces both demos outside checkout; all 48 new table cells, complete witness metadata, extreme-log underflow reporting, independent Gaussian quadrature references and rare-event probabilities are tested. Standard importance/IWAE results credit Burda, Grosse & Salakhutdinov, [Importance Weighted Autoencoders](https://arxiv.org/abs/1509.00519), Section 3. [IMPORTANCE.md](IMPORTANCE.md) states the exact assumptions and limits.
+
 ## Run offline
 
 Python 3.10+. Runtime and tests use the standard library only.
@@ -65,7 +81,7 @@ assert restored.decode([0.2, 0.3]) == model.decode([0.2, 0.3])
 
 ## Verification
 
-**25 tests** cover:
+**The 25 original tests** cover:
 
 - Central finite differences against a separately implemented flat-cursor objective for every parameter at hidden sizes 2, 3, 12 and beta 0, 1, 4 (nine full-gradient settings), plus an averaged fixed-noise batch reference.
 - Bounded-logvariance chain rule in saturation, zero-model analytic Gaussian loss, exact-prior KL, beta-objective distinctions and a separately computed first Adam update.
@@ -73,7 +89,7 @@ assert restored.decode([0.2, 0.3]) == model.decode([0.2, 0.3])
 - Tiny exact sliced-distance identities, separate likelihood-noise streams, real default training, reconstruction/prior distinctions and an origin-collapse control.
 - Byte-reproducible SVG, all 12 displayed metric lines, all 1536 scatter-point coordinates and shared-axis geometry, full compressed-report metadata, and detection of a hidden parameter change.
 
-CI runs Python 3.10-3.13 tests, the real demo, figure check, wheel build and installed CLI outside the checkout. Installed and source demos are compared as complete JSON objects. Cross-version last-bit float identity of a committed fixture is not promised.
+CI runs Python 3.10-3.13 tests, both real demos, both figure checks, wheel build and installed CLI outside the checkout. Installed and source demos are compared as complete JSON objects. Cross-version last-bit float identity of a committed fixture is not promised.
 
 ## Attribution and limits
 
