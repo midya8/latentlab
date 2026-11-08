@@ -1,0 +1,33 @@
+name: ci
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.10', '3.11', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m unittest discover -s tests -v
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - run: python -m latentlab demo > /tmp/demo.json
+      - run: python examples/render_audit.py --check
+      - run: pip wheel --no-deps --no-build-isolation . -w /tmp/wheels
+      - run: pip install --no-deps /tmp/wheels/latentlab-0.1.0-py3-none-any.whl
+      - run: cd /tmp && latentlab demo > /tmp/wheel-demo.json
+      - run: python -c "import json; a=json.load(open('/tmp/demo.json')); b=json.load(open('/tmp/wheel-demo.json')); assert a==b"
