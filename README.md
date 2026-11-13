@@ -1,14 +1,19 @@
 # LatentLab
 
-A Gaussian variational autoencoder built from scalar Python operations. No NumPy, PyTorch, autograd, downloaded data or hosted model. The encoder, stochastic latent path, analytic KL, decoder and every parameter gradient are inspectable.
+LatentLab trains a small Gaussian variational autoencoder using scalar Python operations. It shows the encoder, stochastic latent path, analytic KL, decoder and every parameter gradient without NumPy, PyTorch, autograd, downloaded data or a hosted model.
 
-The interesting result is a failure of reconstruction as a generation metric. On the included eight-mode fixture, removing the KL term gives slightly **lower posterior-mean reconstruction error**, yet worse prior samples and a much higher negative ELBO. The beta 1 model improves generation but still puts **51.56%** of its noisy prior samples farther than radius 0.3 from every data mode. This is not a solved generation benchmark.
+Two reports keep generation and evidence estimation separate:
+
+- [VAE training and generation](DESIGN.md): compare posterior-mean reconstruction, noisy prior samples and a fixed-noise Monte Carlo objective.
+- [Importance evidence](IMPORTANCE.md): inspect individual log-evidence estimates, expected IWAE bounds and same-sample Jensen comparisons.
+
+The default fixture shows why reconstruction alone is not a generation metric. On the included eight-mode fixture, removing the KL term gives slightly **lower posterior-mean reconstruction error**, yet worse prior samples and a much higher negative ELBO. The beta 1 model improves generation but still puts **51.56%** of its noisy prior samples farther than radius 0.3 from every data mode. This is not a solved generation benchmark.
 
 ![Measured initial and trained prior samples versus posterior-mean reconstructions](assets/latent-audit.svg)
 
-## Importance evidence audit (v0.2)
+## Importance evidence audit
 
-The new [importance audit](IMPORTANCE.md) separates random log-evidence estimates, expected IWAE bounds and same-sample Jensen comparisons. Log-space weights preserve every latent/proposal/joint witness. For the original trained beta 1 model at x=(1,0), shared noise prefixes give log estimates -2.0464, 0.7106, -0.2701, -0.9271 for K=1,4,16,64: larger prefixes are not realization-wise guarantees. Actual nonlinear evidence is unknown.
+The [importance audit](IMPORTANCE.md) separates random log-evidence estimates, expected IWAE bounds and same-sample Jensen comparisons. Log-space weights preserve every latent/proposal/joint witness. For the original trained beta 1 model at x=(1,0), shared noise prefixes give log estimates -2.0464, 0.7106, -0.2701, -0.9271 for K=1,4,16,64: larger prefixes are not realization-wise guarantees. Actual nonlinear evidence is unknown.
 
 An independent linear-Gaussian exact-posterior control recovers log evidence -2.153795. A two-atom full-support control has **ESS 64 while underestimating evidence by factor 999,000**, on an event with probability **93.80%**. Exact rational enumeration verifies unbiased mean evidence and the increasing expected-log hierarchy, which still remains far from the truth. This adds evidence diagnostics, not IWAE training or an ESS accuracy certificate.
 
@@ -49,7 +54,7 @@ The demo trains both arms for 800 updates on 128 synthetic points, then evaluate
 
 Samples are from `z ~ N(0,I)` **and** `x ~ N(decoder(z),0.2² I)`, not just decoder means. Reconstructions are `decoder(mu(x))`, not posterior predictive draws. The plot has six equal-axis panels and encodes the complete measured JSON report, including both trained checkpoints. Source data, all 128 predictions per arm, losses, histories and 150 parameters are in [examples/demo.json](examples/demo.json).
 
-The comparisons are descriptive for this particular seed, tiny data, architecture and training budget. They do not isolate a universal causal mechanism or establish superiority over another model. Sliced transport uses an empirical fixed direction grid, not the full Wasserstein distance. Radius0.3 is a disclosed fixture diagnostic, not a calibrated support test.
+The comparisons are descriptive for this particular seed, tiny data, architecture and training budget. They do not isolate a universal causal mechanism or establish superiority over another model. Sliced transport uses an empirical fixed direction grid, not the full Wasserstein distance. Radius 0.3 is a disclosed fixture diagnostic, not a calibrated support test.
 
 ## What is implemented
 
@@ -95,4 +100,4 @@ CI runs Python 3.10-3.13 tests, both real demos, both figure checks, wheel build
 
 Reparameterized variational autoencoding and the analytic Gaussian KL follow Kingma & Welling, [Auto-Encoding Variational Bayes](https://arxiv.org/abs/1312.6114), particularly Sections 2-3 and Appendices B-C. This is an original small implementation and synthetic audit, not a new algorithm, reproduction of their experiments, pretrained model or production library. [DESIGN.md](DESIGN.md) states the exact objective and derivative paths.
 
-One two-dimensional toy dataset, one default seed, diagonal posterior, bounded posterior variance, fixed observation noise, small neural nets and a short training budget. No image generation, disentanglement, likelihood estimate, posterior-exactness guarantee, uncertainty calibration, high-dimensional scaling or broad robustness claim. MIT.
+One two-dimensional toy dataset, one default seed, diagonal posterior, bounded posterior variance, fixed observation noise, small neural nets and a short training budget. The original VAE workflow makes no marginal-likelihood estimate; the separate importance report above is a random estimate, not exact evidence. No image generation, disentanglement, posterior-exactness guarantee, uncertainty calibration, high-dimensional scaling or broad robustness claim. MIT.
