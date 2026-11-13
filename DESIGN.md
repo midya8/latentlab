@@ -1,4 +1,4 @@
-# Gaussian VAE objective and derivative audit
+# LatentLab VAE training and generation method
 
 ## Explicit model
 
