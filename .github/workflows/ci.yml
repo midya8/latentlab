@@ -37,3 +37,9 @@ jobs:
       - run: python -c "import json; a=json.load(open('/tmp/demo.json')); b=json.load(open('/tmp/wheel-demo.json')); assert a==b"
       - run: cd /tmp && latentlab importance-demo > /tmp/wheel-importance-demo.json
       - run: python -c "import json; assert json.load(open('/tmp/importance-demo.json'))==json.load(open('/tmp/wheel-importance-demo.json'))"
+      - run: |
+          ROOT="$GITHUB_WORKSPACE" python - <<'PY'
+          import os, pathlib, subprocess, sys
+          root=pathlib.Path(os.environ['ROOT'])
+          subprocess.run([sys.executable, '-m', 'unittest', 'discover', '-s', str(root/'tests'), '-p', 'test_hidden_labels.py', '-v'], cwd='/tmp', check=True)
+          PY
