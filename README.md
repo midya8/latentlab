@@ -27,6 +27,27 @@ python examples/render_importance.py --check
 
 43 tests now pass (25 original, 15 importance, 3 new figure tests). The original demo and SVG are unchanged. The five-module v0.2 wheel reproduces both demos outside checkout; all 48 new table cells, complete witness metadata, extreme-log underflow reporting, independent Gaussian quadrature references and rare-event probabilities are tested. Standard importance/IWAE results credit Burda, Grosse & Salakhutdinov, [Importance Weighted Autoencoders](https://arxiv.org/abs/1509.00519), Section 3. [IMPORTANCE.md](IMPORTANCE.md) states the exact assumptions and limits.
 
+## Hidden-unit labels and signs
+
+Four additional tests rename and sign-flip tanh hidden units in the encoder
+and decoder, with matching changes to the outgoing weights. On both archived
+trained checkpoints and 18 generated models, encode/decode outputs, all loss
+terms and every pathwise gradient coordinate follow that mapping. Eight short
+five-update Adam runs use the same data/noise stream; their parameters and
+reported losses also follow it. Nine complete importance audits compare every
+latent, density, weight and summary field. A one-sided sign flip changes the
+decoder, as it should.
+
+These are finite consistency checks at relative/absolute tolerance `2e-10`,
+not an independent gradient or evidence oracle, bitwise equivalence, arbitrary
+basis invariance or generation-quality improvement. Hidden-unit changes do not
+rename latent coordinates, so the explicit epsilon stream is unchanged. This
+is not a same-seed guarantee for latent-coordinate transformations.
+
+The current suite has 47 Python tests; all 43 earlier tests remain unchanged.
+The installed-wheel check also runs the four new tests outside checkout.
+Model code, trained parameters, both saved demos and figure bytes are unchanged.
+
 ## Run offline
 
 Python 3.10+. Runtime and tests use the standard library only.
