@@ -48,6 +48,23 @@ The current suite has 47 Python tests; all 43 earlier tests remain unchanged.
 The installed-wheel check also runs the four new tests outside checkout.
 Model code, trained parameters, both saved demos and figure bytes are unchanged.
 
+## Signed latent coordinates
+
+`relabel_latents(model, order, signs)` returns a detached checkpoint under one of the eight signed permutations of the two latent axes. Encoder means and decoder input weights follow signs and order; diagonal logvariances follow order only. The represented observation distribution is unchanged. This does not support arbitrary rotations of diagonal posteriors or improve generation.
+
+Realization-wise comparisons require the same map on explicit epsilon draws. Keeping the same seed or untransformed epsilon stream does not provide that coupling. Six new tests check both archived checkpoints and twelve generated models, every parameter/gradient coordinate across all eight maps, complete importance witnesses, all 64 map compositions and eight short explicitly coupled training runs. [Mapping, noise convention and limits](COORDINATES.md).
+
+```python
+from latentlab import relabel_latents
+other = relabel_latents(model, order=[1,0], signs=[-1,1])
+```
+
+The current suite has 53 tests. The full installed-wheel verifier runs every test outside checkout, checks all six origins, compares all three complete CLI reports and regenerates both figures. The earlier model/training arithmetic, all trained checkpoint values, both saved demos and both SVG files are unchanged. The checks are finite floating-point consistency tests, not a new gradient or evidence oracle.
+
+```sh
+python examples/verify_wheel.py
+```
+
 ## Run offline
 
 Python 3.10+. Runtime and tests use the standard library only.
@@ -115,7 +132,7 @@ assert restored.decode([0.2, 0.3]) == model.decode([0.2, 0.3])
 - Tiny exact sliced-distance identities, separate likelihood-noise streams, real default training, reconstruction/prior distinctions and an origin-collapse control.
 - Byte-reproducible SVG, all 12 displayed metric lines, all 1536 scatter-point coordinates and shared-axis geometry, full compressed-report metadata, and detection of a hidden parameter change.
 
-CI runs Python 3.10-3.13 tests, both real demos, both figure checks, wheel build and installed CLI outside the checkout. Installed and source demos are compared as complete JSON objects. Cross-version last-bit float identity of a committed fixture is not promised.
+CI runs Python 3.10-3.13 tests, both real demos, both figure checks, wheel build and the full installed-package verifier outside the checkout. Installed and source demos are compared as complete JSON objects. Cross-version last-bit float identity of a committed fixture is not promised.
 
 ## Attribution and limits
 
