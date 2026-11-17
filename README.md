@@ -1,4 +1,4 @@
-# LatentLab
+# Variational autoencoder
 
 LatentLab trains a small Gaussian variational autoencoder using scalar Python operations. It shows the encoder, stochastic latent path, analytic KL, decoder and every parameter gradient without NumPy, PyTorch, autograd, downloaded data or a hosted model.
 
@@ -10,6 +10,9 @@ Two reports keep generation and evidence estimation separate:
 The default fixture shows why reconstruction alone is not a generation metric. On the included eight-mode fixture, removing the KL term gives slightly **lower posterior-mean reconstruction error**, yet worse prior samples and a much higher negative ELBO. The beta 1 model improves generation but still puts **51.56%** of its noisy prior samples farther than radius 0.3 from every data mode. This is not a solved generation benchmark.
 
 ![Measured initial and trained prior samples versus posterior-mean reconstructions](assets/latent-audit.svg)
+
+The repository is now `variational-autoencoder`. The Python import and CLI names stay
+`latentlab` for compatibility with existing scripts.
 
 ## Importance evidence audit
 
