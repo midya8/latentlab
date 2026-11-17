@@ -1,6 +1,6 @@
 # Variational autoencoder
 
-LatentLab trains a small Gaussian variational autoencoder using scalar Python operations. It shows the encoder, stochastic latent path, analytic KL, decoder and every parameter gradient without NumPy, PyTorch, autograd, downloaded data or a hosted model.
+This implementation trains a small Gaussian variational autoencoder using scalar Python operations. It shows the encoder, stochastic latent path, analytic KL, decoder and every parameter gradient without NumPy, PyTorch, autograd, downloaded data or a hosted model.
 
 Two reports keep generation and evidence estimation separate:
 
